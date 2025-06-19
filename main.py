@@ -344,9 +344,9 @@ def playing():
                     screen.blit(ai_player, center_tile_position(ai_score))
                     #Display ladder/snakes message
                     if ladder:
-                        display_message("You Climbed a Ladder", 650, 500, BLACK)
+                        display_message("You Climbed a Ladder", 560, 680, BLACK)
                     elif snake:
-                        display_message("You Got Bitten by a Snake!", 650, 500, BLACK)
+                        display_message("You Got Bitten by a Snake!", 560, 680, BLACK)
 
                     pygame.display.update()
                     pygame.time.wait(1500)
@@ -394,6 +394,9 @@ def playing():
                         display_message("Board is Shuffling!!", 560, 680, BLACK)
                         snakes, ladders = generate_snakes_ladders()
                         turn_count = 0
+                        pygame.display.update()
+                        pygame.time.wait(1500)
+
         # Check for Win
         if human_score >= 100:
             display_message("You Win!!", 560, 680, YELLOW)
