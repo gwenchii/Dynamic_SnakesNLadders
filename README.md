@@ -11,10 +11,10 @@
 ## 🎮 Game Preview
 
 ### 🏁 Main Menu  
-![Main Menu](images/menu_preview.png)
+![Main Menu](images/screenshot1.png)
 
 ### 🎲 Gameplay  
-![Gameplay](images/gameplay_preview.png)
+![Gameplay](images/screenshot2.png)
 
 ---
 
