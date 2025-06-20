@@ -179,17 +179,20 @@ def display_dice(value):
 def turn(score, ladders, snakes, dice_roll):
     ladder = False
     snake = False
-    score += dice_roll
-    # check if new position has ladder or snake
-    if score <= 100:
-        if score in ladders:
-            score = ladders[score]
-            ladder = True
-        elif score in snakes:
-            score = snakes[score]
-            snake = True
-    else: 
-        score -= dice_roll
+    new_score = score + dice_roll
+    
+    # Automatic win for each roll that exceeds 100
+    if new_score >= 100:
+        return 100, ladder, snake 
+    
+    score = new_score
+    if score in ladders:
+        score = ladders[score]
+        ladder = True
+    elif score in snakes:
+        score = snakes[score]
+        snake = True
+    
     return score, ladder, snake
 
 def expectiminimax(position, depth, is_maximizing, snakes, ladders):
@@ -227,45 +230,6 @@ def expectiminimax_decision(position, snakes, ladders):
             best_move = dice
     return best_move
 
-# To animate player movement
-def animate_player_move(start_pos, end_pos, player_image, snakes, ladders, other_player_pos, other_image):
-    step = 1 if end_pos > start_pos else -1 
-    path = []
-    current_pos = start_pos   
-    
-    while current_pos != end_pos:
-        current_pos += step
-        path.append(current_pos)
-
-        if step > 0:
-            # To Climb
-            if current_pos in ladders:
-                path.extend([current_pos] * 5)
-                current_pos = ladders[current_pos]
-            # To Slide
-            elif current_pos in snakes:
-                path.extend([current_pos] * 5)
-                current_pos = snakes[current_pos]
-
-    screen.blit(main_background, (0, 0))
-    draw_board()
-    draw_snakes_ladders(snakes, ladders)
-    draw_control_buttons()
-
-    # To animate each steps
-    for pos in path:
-        screen.blit(main_background, (0, 0))
-        draw_board()
-        draw_snakes_ladders(snakes, ladders)
-        draw_control_buttons()
-        screen.blit(other_image, center_tile_position(other_player_pos))
-        screen.blit(player_image, center_tile_position(pos))
-        # Update Display
-        pygame.display.update()
-        pygame.time.delay(50)
-
-    return end_pos
-
 # Quit Game
 def quit_game():
     pygame.quit()
@@ -296,6 +260,7 @@ def playing():
     ai_score = 0
     snakes, ladders = generate_snakes_ladders()
     turn_count = 0
+    game_over = False 
 
     while True:
         # Game Screen
@@ -303,10 +268,10 @@ def playing():
         draw_board()
         draw_snakes_ladders(snakes, ladders)
         draw_control_buttons()
+        
         # Player Tokens
         x_human, y_human = center_tile_position(human_score)
         x_ai, y_ai = center_tile_position(ai_score)
-
         screen.blit(human_player, (x_human, y_human))
         screen.blit(ai_player, (x_ai, y_ai))
 
@@ -322,19 +287,14 @@ def playing():
                     return
                 elif quitgame_rect.collidepoint(mouse_pos):
                     quit_game() # Quit Game
-                elif rolldice_rect.collidepoint(mouse_pos):
-                    #------ Human Player Turn--------
+                elif rolldice_rect.collidepoint(mouse_pos) and not game_over:
+                    # Human Player Turn
                     dice_value = randint(1, 6)
                     display_dice(dice_value)
                     pygame.time.wait(500)
-                    # to calculate new position based on the rolled dice value
-                    target_score, ladder, snake = turn(human_score, ladders, snakes, dice_value)
-                    # to animate movement based on the score
-                    human_score = animate_player_move(
-                        human_score, target_score, human_player, snakes, ladders,
-                        ai_score, ai_player
-                    )
-
+                    
+                    human_score, ladder, snake = turn(human_score, ladders, snakes, dice_value)
+                    
                     # Redraw final position
                     screen.blit(main_background, (0, 0))
                     draw_board()
@@ -342,16 +302,25 @@ def playing():
                     draw_control_buttons()
                     screen.blit(human_player, center_tile_position(human_score))
                     screen.blit(ai_player, center_tile_position(ai_score))
-                    #Display ladder/snakes message
+                    
+                    # Display messages
                     if ladder:
-                        display_message("You Climbed a Ladder", 560, 680, BLACK)
+                        display_message("You Climbed a Ladder!", 560, 680, BLACK)
                     elif snake:
                         display_message("You Got Bitten by a Snake!", 560, 680, BLACK)
-
+                    
                     pygame.display.update()
                     pygame.time.wait(1500)
 
-                    #------AI Player Turn------
+                    # Check for human win
+                    if human_score == 100:
+                        display_message("You Win!!", 560, 680, YELLOW)
+                        pygame.display.update()
+                        game_over = True
+                        pygame.time.wait(3000)
+                        break
+
+                    # AI Player Turn
                     screen.blit(main_background, (0, 0))
                     draw_board()
                     draw_snakes_ladders(snakes, ladders)
@@ -362,16 +331,13 @@ def playing():
                     pygame.display.update()
                     pygame.time.wait(2500)
 
-                    # expectiminimax decision 
+                    # AI decision
                     dice_value = expectiminimax_decision(ai_score, snakes, ladders)
                     display_dice(dice_value)
                     pygame.time.wait(1000)
-                    target_score, ladder, snake = turn(ai_score, ladders, snakes, dice_value)
-                    ai_score = animate_player_move(
-                        ai_score, target_score, ai_player, snakes, ladders,
-                        human_score, human_player
-                    )
-
+                    
+                    ai_score, ladder, snake = turn(ai_score, ladders, snakes, dice_value)
+                    
                     # Redraw final position
                     screen.blit(main_background, (0, 0))
                     draw_board()
@@ -379,14 +345,23 @@ def playing():
                     draw_control_buttons()
                     screen.blit(human_player, center_tile_position(human_score))
                     screen.blit(ai_player, center_tile_position(ai_score))
-                    #Display ladder/snakes message
+                    
+                    # Display messages
                     if ladder:
                         display_message("AI Climbed a Ladder!", 560, 680, BLACK)
                     elif snake:
-                        display_message("AI Got Bitten by a Snake!!", 560, 680, BLACK)
+                        display_message("AI Got Bitten by a Snake!", 560, 680, BLACK)
 
                     pygame.display.update()
                     pygame.time.wait(1500)
+
+                    # Check for AI win
+                    if ai_score == 100:
+                        display_message("AI Wins!", 560, 680, YELLOW)
+                        pygame.display.update()
+                        game_over = True
+                        pygame.time.wait(3000)
+                        break
 
                     # Board Shuffling every 2 turns 
                     turn_count += 1
@@ -397,21 +372,13 @@ def playing():
                         pygame.display.update()
                         pygame.time.wait(1500)
 
-        # Check for Win
-        if human_score >= 100:
-            display_message("You Win!!", 560, 680, YELLOW)
-            pygame.display.update()
-            pygame.time.wait(3000)
-            break
+        # Restart game if Game over
+        if game_over:
+            display_message("Click Restart to play again", 560, 680, BLACK)
+reak
 
         if ai_score >= 100:
             display_message("AI Wins!", 560, 680, YELLOW)
             pygame.display.update()
             pygame.time.wait(3000)
             break
-
-        pygame.display.update()
-        clock.tick(10)
-
-if __name__ == "__main__":
-    main_menu()
