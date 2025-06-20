@@ -374,7 +374,7 @@ def playing():
 
         # Restart game if Game over
         if game_over:
-            display_message("Click Restart to play again", 560, 720, BLACK)
+            display_message("Click Restart to play again", 560, 680, BLACK)
             pygame.display.update()
 
         pygame.display.update()
