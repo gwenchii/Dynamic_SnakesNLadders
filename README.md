@@ -23,7 +23,7 @@
 1. **Clone the repository:**
 
    ```bash
-   https://github.com/gwenchii/Dynamic_SnakesNLadders.git
+   https://github.com/gwenchii/Dynamic_Snakes_and_Ladders.git
    
 2. Install dependencies:
    ```bash
@@ -31,3 +31,15 @@
 4. Run the game
    ``` bash
    python main.py
+
+---
+
+## 👥 Prepared By
+
+**Group 9 | BSCS 3-4 **  
+- Baluyot, Arron Ken L.  
+- Batalla, Stephanie E.  
+- Blanquer, Jhoanna Joy S.  
+- Serote, Jiro Domingo V.
+
+**2024–2025**
