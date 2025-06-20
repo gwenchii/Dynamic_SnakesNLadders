@@ -374,11 +374,11 @@ def playing():
 
         # Restart game if Game over
         if game_over:
-            display_message("Click Restart to play again", 560, 680, BLACK)
-reak
-
-        if ai_score >= 100:
-            display_message("AI Wins!", 560, 680, YELLOW)
+            display_message("Click Restart to play again", 560, 720, BLACK)
             pygame.display.update()
-            pygame.time.wait(3000)
-            break
+
+        pygame.display.update()
+        clock.tick(10)
+
+if __name__ == "__main__":
+    main_menu()
