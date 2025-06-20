@@ -24,7 +24,7 @@
 
    ```bash
    git clone https://github.com/yourusername/snakes-and-ladders.git
-   cd snakes-and-ladders
+   
 2. Install dependencies:
    ```bash
    pip install pygame
